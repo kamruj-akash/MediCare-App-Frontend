@@ -1,4 +1,5 @@
 {
+  // use biome as the default formatter for all supported languages
   "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
