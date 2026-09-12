@@ -1,24 +1,55 @@
 "use client";
 
+import { useLogin } from "@/hooks";
 import { LoginZodSchema } from "@/validation/auth.validation";
 import { useForm } from "@tanstack/react-form";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { toast } from "../ui/toast";
 
 export default function LoginForm() {
+  const router = useRouter();
+  const { mutate: login, isPending: loginPending } = useLogin();
+
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "patient1@gmail.com",
+      password: "Patient123",
     },
     validators: {
       onSubmit: LoginZodSchema,
     },
-    onSubmit: (data) => {
-      console.log(data);
+    onSubmit: ({ value }) => {
+      const loginData = {
+        email: value.email,
+        password: value.password,
+      };
+
+      login(loginData, {
+        onSuccess: (res) => {
+          console.log(res);
+          toast.add({
+            title: "Login Successful",
+            description: res?.message || "You have successfully logged in.",
+            type: "success",
+          });
+          router.push("/");
+        },
+
+        onError: (err) => {
+          console.error(err);
+          toast.add({
+            title: "Login Failed",
+            description: err?.message || "Invalid email or password.",
+            type: "error",
+          });
+        },
+      });
     },
   });
+
   return (
     <div>
       <form
@@ -60,6 +91,7 @@ export default function LoginForm() {
                 <Input
                   id={field.name}
                   type="password"
+                  value={field.state.value}
                   name={field.name}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
@@ -71,8 +103,8 @@ export default function LoginForm() {
             );
           }}
         </form.Field>
-        <Button type="submit" className="w-full">
-          Submit
+        <Button disabled={loginPending} type="submit" className="w-full">
+          {loginPending ? "Logging in..." : "Login"}
         </Button>
       </form>
     </div>

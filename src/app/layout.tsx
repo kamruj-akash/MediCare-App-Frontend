@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import Providers from "@/providers/query.provider";
 import type { Metadata } from "next";
@@ -41,7 +42,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <Providers>
-        <body className="min-h-full flex flex-col">{children}</body>
+        <body className="min-h-full flex flex-col">
+          {children}
+          <Toaster />
+        </body>
       </Providers>
     </html>
   );
