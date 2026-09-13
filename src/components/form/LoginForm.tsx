@@ -1,19 +1,19 @@
 "use client";
 
-import { useGoogleOAuth, useLogin } from "@/hooks";
+import { useLogin } from "@/hooks";
 import { LoginZodSchema } from "@/validation/auth.validation";
-import { GoogleLogin } from "@react-oauth/google";
 import { useForm } from "@tanstack/react-form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import GoogleAuth from "../auth/googleAuth";
 import { Button } from "../ui/button";
-import { Field, FieldError, FieldLabel, FieldSeparator } from "../ui/field";
+import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { toast } from "../ui/toast";
 
 export default function LoginForm() {
   const router = useRouter();
   const { mutate: login, isPending: loginPending } = useLogin();
-  const { mutate: googleLogin } = useGoogleOAuth();
 
   const form = useForm({
     defaultValues: {
@@ -109,53 +109,16 @@ export default function LoginForm() {
           {loginPending ? "Logging in..." : "Login"}
         </Button>
       </form>
-      <FieldSeparator className="my-4">OR</FieldSeparator>
-      <GoogleLogin
-        theme="filled_blue"
-        onSuccess={(response: { credential?: string }) => {
-          // console.log(response.credential);
-          const idToken = response.credential;
-          if (!idToken) {
-            toast.add({
-              title: "Google Login Failed",
-              description:
-                "No credential received from Google. Please try again.",
-              type: "error",
-            });
-            return;
-          }
-          // console.log(idToken)
-          googleLogin(
-            { idToken },
-            {
-              onSuccess: (res) => {
-                toast.add({
-                  title: "Google Login Successful",
-                  description:
-                    res?.message || "You have successfully logged in.",
-                  type: "success",
-                });
-                router.push("/");
-              },
-              onError: (err) => {
-                console.error(err);
-                toast.add({
-                  title: "Google Login Failed",
-                  description: err?.message || "Unable to login with Google.",
-                  type: "error",
-                });
-              },
-            },
-          );
-        }}
-        onError={() => {
-          toast.add({
-            title: "Google Login Failed",
-            description: "Unable to login with Google. Please try again.",
-            type: "error",
-          });
-        }}
-      />
+      <GoogleAuth />
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/register"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Create an account
+        </Link>
+      </p>
     </div>
   );
 }

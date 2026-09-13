@@ -5,7 +5,7 @@ export const LoginZodSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-export const RegisterZodSchema = z
+export const PatientRegisterZodSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
@@ -15,7 +15,14 @@ export const RegisterZodSchema = z
       .min(6, "Confirm Password must be at least 6 characters long"),
     contactNumber: z
       .string()
-      .regex(/^\d{10}$/, "Contact number must be 10 digits long")
+      .refine(
+        (value) =>
+          value === "" ||
+          /^(?:01[3-9]\d{8}|\+8801[3-9]\d{8}|8801[3-9]\d{8})$/.test(value),
+        {
+          message: "Invalid contact number",
+        },
+      )
       .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
