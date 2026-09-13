@@ -2,7 +2,12 @@
 
 import React from "react";
 import QueryProviders from ".";
+import { GoogleAuthProvider } from "./google-auth.provider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <QueryProviders>{children}</QueryProviders>;
+  return (
+    <GoogleAuthProvider>
+      <QueryProviders>{children}</QueryProviders>
+    </GoogleAuthProvider>
+  );
 }
