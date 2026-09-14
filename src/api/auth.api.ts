@@ -9,6 +9,10 @@ export const userRegister = (payload: TUserRegister) => {
   return apiClient("/auth/register", { method: "POST", body: payload });
 };
 
+export const verifyEmailOtp = (payload: { email: string; otp: string }) => {
+  return apiClient("/auth/verify-email", { method: "POST", body: payload });
+};
+
 export const userLogout = () => {
   return apiClient("/auth/logout", { method: "POST" });
 };

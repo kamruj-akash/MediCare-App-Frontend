@@ -3,8 +3,10 @@
 import { useRegister } from "@/hooks";
 import { PatientRegisterZodSchema } from "@/validation/auth.validation";
 import { useForm } from "@tanstack/react-form";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { z } from "zod";
 import GoogleAuth from "../auth/googleAuth";
 import { Button } from "../ui/button";
@@ -15,6 +17,9 @@ import { toast } from "../ui/toast";
 export default function PatientRegisterForm() {
   const router = useRouter();
   const { mutate: register, isPending } = useRegister();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
   type FormDefaultValues = z.infer<typeof PatientRegisterZodSchema>;
   const defaultValues: FormDefaultValues = {
     name: "Patient One",
@@ -156,18 +161,36 @@ export default function PatientRegisterForm() {
             return (
               <Field data-invalid={isValid}>
                 <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                <Input
-                  type="password"
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
-                  autoComplete="off"
-                  aria-invalid={isValid}
-                />
+                <div className="relative">
+                  <Input
+                    type={isPasswordVisible ? "text" : "password"}
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    autoComplete="new-password"
+                    aria-invalid={isValid}
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsPasswordVisible((visible) => !visible)}
+                    className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    aria-label={
+                      isPasswordVisible ? "Hide password" : "Show password"
+                    }
+                    aria-pressed={isPasswordVisible}
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOff className="size-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-4" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 {isValid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
@@ -181,18 +204,40 @@ export default function PatientRegisterForm() {
             return (
               <Field data-invalid={isValid}>
                 <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
-                  autoComplete="off"
-                  aria-invalid={isValid}
-                />
+                <div className="relative">
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type={isConfirmPasswordVisible ? "text" : "password"}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    autoComplete="new-password"
+                    aria-invalid={isValid}
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIsConfirmPasswordVisible((visible) => !visible)
+                    }
+                    className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    aria-label={
+                      isConfirmPasswordVisible
+                        ? "Hide confirmation password"
+                        : "Show confirmation password"
+                    }
+                    aria-pressed={isConfirmPasswordVisible}
+                  >
+                    {isConfirmPasswordVisible ? (
+                      <EyeOff className="size-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-4" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 {isValid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );

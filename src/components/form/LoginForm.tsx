@@ -3,8 +3,10 @@
 import { useLogin } from "@/hooks";
 import { LoginZodSchema } from "@/validation/auth.validation";
 import { useForm } from "@tanstack/react-form";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import GoogleAuth from "../auth/googleAuth";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
@@ -14,6 +16,7 @@ import { toast } from "../ui/toast";
 export default function LoginForm() {
   const router = useRouter();
   const { mutate: login, isPending: loginPending } = useLogin();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -90,16 +93,36 @@ export default function LoginForm() {
             return (
               <Field data-invalid={isValid}>
                 <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                <Input
-                  id={field.name}
-                  type="password"
-                  value={field.state.value}
-                  name={field.name}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    // autoComplete = "off";
-                  }}
-                />
+                <div className="relative">
+                  <Input
+                    id={field.name}
+                    type={isPasswordVisible ? "text" : "password"}
+                    value={field.state.value}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    autoComplete="current-password"
+                    aria-invalid={isValid}
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsPasswordVisible((visible) => !visible)}
+                    className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    aria-label={
+                      isPasswordVisible ? "Hide password" : "Show password"
+                    }
+                    aria-pressed={isPasswordVisible}
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOff className="size-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="size-4" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
                 {isValid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
