@@ -1,14 +1,13 @@
 import { useVerifyEmailOtp } from "@/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  ClipboardEvent,
-  FormEvent,
-  KeyboardEvent,
-  useRef,
-  useState,
-} from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "../ui/input-otp";
 import { toast } from "../ui/toast";
 
 export default function VerifyOtp() {
@@ -16,52 +15,9 @@ export default function VerifyOtp() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const OTP_LENGTH = 6;
-  const OTP_SLOTS = ["one", "two", "three", "four", "five", "six"] as const;
 
   const { mutateAsync: verifyEmail, isPending } = useVerifyEmailOtp();
-  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const otpValue = otp.join("");
-
-  const updateOtp = (index: number, value: string) => {
-    const digit = value.replace(/\D/g, "").slice(-1);
-    const nextOtp = [...otp];
-    nextOtp[index] = digit;
-    setOtp(nextOtp);
-
-    if (digit && index < OTP_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handlePaste = (event: ClipboardEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const digits = event.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, OTP_LENGTH)
-      .split("");
-
-    if (!digits.length) return;
-
-    setOtp([...digits, ...Array(OTP_LENGTH - digits.length).fill("")]);
-    inputRefs.current[Math.min(digits.length, OTP_LENGTH) - 1]?.focus();
-  };
-
-  const handleKeyDown = (
-    event: KeyboardEvent<HTMLInputElement>,
-    index: number,
-  ) => {
-    if (event.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-    if (event.key === "ArrowLeft" && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-    if (event.key === "ArrowRight" && index < OTP_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
+  const [otpValue, setOtpValue] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -79,7 +35,6 @@ export default function VerifyOtp() {
         description: "Please enter the complete code from your email.",
         type: "error",
       });
-      inputRefs.current[otp.findIndex((digit) => !digit)]?.focus();
       return;
     }
 
@@ -120,24 +75,45 @@ export default function VerifyOtp() {
       <form onSubmit={handleSubmit} className="mt-7">
         <fieldset>
           <legend className="sr-only">Six-digit verification code</legend>
-          <div className="flex justify-between gap-2" onPaste={handlePaste}>
-            {OTP_SLOTS.map((slot, index) => (
-              <Input
-                key={slot}
-                ref={(element) => {
-                  inputRefs.current[index] = element;
-                }}
-                value={otp[index]}
-                onChange={(event) => updateOtp(index, event.target.value)}
-                onKeyDown={(event) => handleKeyDown(event, index)}
-                inputMode="numeric"
-                autoComplete={index === 0 ? "one-time-code" : "off"}
-                aria-label={`Verification code digit ${index + 1}`}
-                className="h-12 min-w-0 flex-1 px-0 text-center text-lg font-semibold md:h-14"
-                maxLength={1}
+          <InputOTP
+            maxLength={OTP_LENGTH}
+            value={otpValue}
+            onChange={setOtpValue}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            aria-label="Six-digit verification code"
+            containerClassName="justify-center gap-2"
+          >
+            <InputOTPGroup>
+              <InputOTPSlot
+                index={0}
+                className="size-12 text-lg font-semibold md:size-14"
               />
-            ))}
-          </div>
+              <InputOTPSlot
+                index={1}
+                className="size-12 text-lg font-semibold md:size-14"
+              />
+              <InputOTPSlot
+                index={2}
+                className="size-12 text-lg font-semibold md:size-14"
+              />
+            </InputOTPGroup>
+            <InputOTPSeparator className="text-muted-foreground" />
+            <InputOTPGroup>
+              <InputOTPSlot
+                index={3}
+                className="size-12 text-lg font-semibold md:size-14"
+              />
+              <InputOTPSlot
+                index={4}
+                className="size-12 text-lg font-semibold md:size-14"
+              />
+              <InputOTPSlot
+                index={5}
+                className="size-12 text-lg font-semibold md:size-14"
+              />
+            </InputOTPGroup>
+          </InputOTP>
         </fieldset>
 
         <Button
