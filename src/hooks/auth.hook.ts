@@ -1,4 +1,5 @@
 import {
+  doctorApply,
   getMe,
   googleOAuth,
   userLogin,
@@ -42,5 +43,11 @@ export function useGetMe() {
     queryKey: ["getMe"],
     queryFn: getMe,
     retry: false,
+  });
+}
+
+export function useDoctorApply() {
+  return useMutation({
+    mutationFn: doctorApply,
   });
 }

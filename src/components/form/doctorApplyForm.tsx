@@ -1,68 +1,81 @@
 "use client";
 
-import { useLogin } from "@/hooks";
-import { LoginZodSchema } from "@/validation/auth.validation";
+import { useDoctorApply } from "@/hooks";
 import { useForm } from "@tanstack/react-form";
 import { Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import GoogleAuth from "../auth/googleAuth";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { toast } from "../ui/toast";
 
-export default function LoginForm() {
-  const router = useRouter();
-  const { mutate: login, isPending: loginPending } = useLogin();
+export default function DoctorApplyForm() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { mutate: doctorApplyMutation, isPending } = useDoctorApply();
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
-      email: "patient1@gmail.com",
-      password: "Patient123",
-    },
-    validators: {
-      onSubmit: LoginZodSchema,
+      name: "Dr. Akash",
+      email: "dr.akash@example.com",
+      password: "123456",
     },
     onSubmit: ({ value }) => {
-      const loginData = {
+      const applyData = {
+        name: value.name,
         email: value.email,
         password: value.password,
       };
 
-      login(loginData, {
+      doctorApplyMutation(applyData, {
         onSuccess: (res) => {
-          console.log(res);
           toast.add({
-            title: "Login Successful",
-            description: res?.message || "You have successfully logged in.",
-            type: "success",
+            description: res?.message || "You have successfully applied.",
+            type: res?.success ? "success" : "error",
           });
-          router.push("/");
-        },
-
-        onError: (err) => {
-          console.error(err);
-          toast.add({
-            title: "Login Failed",
-            description: err?.message || "Invalid email or password.",
-            type: "error",
-          });
+          if (res?.success) {
+            const params = new URLSearchParams({
+              email: value.email,
+            }).toString();
+            router.push(`/register/doctor/verify?${params}`);
+          }
         },
       });
     },
   });
 
   return (
-    <>
+    <div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
         }}
       >
+        <form.Field name="name">
+          {(field) => {
+            const isValid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isValid}>
+                <FieldLabel htmlFor={field.name}>name</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
+                  autoComplete="off"
+                  aria-invalid={isValid}
+                />
+                {isValid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
         <form.Field name="email">
           {(field) => {
             const isValid =
@@ -128,20 +141,10 @@ export default function LoginForm() {
             );
           }}
         </form.Field>
-        <Button disabled={loginPending} type="submit" className="w-full mt-2">
-          {loginPending ? "Logging in..." : "Login"}
+        <Button type="submit" className="w-full mt-2">
+          {isPending ? "Submitting..." : "Submit"}
         </Button>
       </form>
-      <GoogleAuth />
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/register"
-          className="font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Create an account
-        </Link>
-      </p>
-    </>
+    </div>
   );
 }

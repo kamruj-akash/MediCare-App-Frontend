@@ -27,3 +27,11 @@ export const googleOAuth = (payload: { idToken: string }) => {
     body: { idToken: payload.idToken },
   });
 };
+
+export const doctorApply = (payload: {
+  name: string;
+  email: string;
+  password: string;
+}) => {
+  return apiClient("/doctor/apply", { method: "POST", body: payload });
+};
