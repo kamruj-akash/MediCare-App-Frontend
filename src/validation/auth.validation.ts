@@ -29,3 +29,28 @@ export const PatientRegisterZodSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const DoctorVerificationZodSchema = z.object({
+  otp: z.string().regex(/^\d{6}$/, "Enter the six-digit verification code"),
+  specialization: z.string().min(2, "Specialization is required"),
+  licenseNumber: z.string().min(3, "License number is required"),
+  qualification: z.string().min(2, "Qualification is required"),
+  expYear: z
+    .number()
+    .int("Experience must be a whole number")
+    .min(0, "Experience cannot be negative")
+    .max(80, "Enter a valid number of years"),
+  bio: z
+    .string()
+    .min(20, "Tell patients a little more about your experience")
+    .max(1000, "Bio must be 1,000 characters or less"),
+  consultationFee: z
+    .string()
+    .regex(/^\d+(?:\.\d{1,2})?$/, "Enter a valid consultation fee"),
+  contactNumber: z
+    .string()
+    .regex(
+      /^(?:01[3-9]\d{8}|\+8801[3-9]\d{8}|8801[3-9]\d{8})$/,
+      "Enter a valid Bangladeshi contact number",
+    ),
+});
