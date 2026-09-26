@@ -9,6 +9,7 @@ export const acceptedFileTypes = [
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
+
 export function isAcceptedFileType(fileType: string) {
   return acceptedFileTypes.includes(fileType);
 }

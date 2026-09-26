@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  isAcceptedFileSize,
+  isAcceptedFileType,
+} from "./doctor.application.validation";
 
 export const LoginZodSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -52,5 +56,35 @@ export const DoctorVerificationZodSchema = z.object({
     .regex(
       /^(?:01[3-9]\d{8}|\+8801[3-9]\d{8}|8801[3-9]\d{8})$/,
       "Enter a valid Bangladeshi contact number",
+    ),
+  resume: z
+    .custom(
+      (value) =>
+        value === null ||
+        (value instanceof File &&
+          isAcceptedFileSize(value.size) &&
+          isAcceptedFileType(value.type)),
+      {
+        message:
+          "Resume must be a PDF or Word document and not exceed 5MB in size",
+      },
+    )
+    .refine((value) => value instanceof File, {
+      message: "Resume is required",
+    }),
+  additionalFiles: z
+    .array(z.custom<File>((value) => value instanceof File))
+    .max(5, "You can upload a maximum of 5 additional files")
+    .refine(
+      (files) => {
+        return files.every(
+          (file) =>
+            isAcceptedFileSize(file.size) && isAcceptedFileType(file.type),
+        );
+      },
+      {
+        message:
+          "Additional files must be PDF or Word documents and not exceed 5MB in size",
+      },
     ),
 });

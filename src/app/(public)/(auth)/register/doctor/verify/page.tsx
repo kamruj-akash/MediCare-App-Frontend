@@ -12,7 +12,6 @@ import {
 import { toast } from "@/components/ui/toast";
 import { useApplyAsDoctor } from "@/hooks";
 import { applyAsDoctorData } from "@/types/doctor";
-import { isAcceptedFileSize, isAcceptedFileType } from "@/validation";
 import { DoctorVerificationZodSchema } from "@/validation/auth.validation";
 import { type AnyFieldApi, useForm } from "@tanstack/react-form";
 import {
@@ -20,6 +19,7 @@ import {
   BadgeCheck,
   CheckCircle2,
   Clock3,
+  FileText,
   FileUp,
   Plus,
   ShieldCheck,
@@ -33,14 +33,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 // type DoctorVerificationValues = z.output<typeof DoctorVerificationZodSchema>;
 
 const defaultValues: any = {
-  otp: "123456",
-  specialization: "ENT",
-  licenseNumber: "BD-123456",
-  qualification: "MBBS, FCPS",
-  expYear: 1,
-  bio: "Experienced ENT specialist with 1 year of experience. Skilled in diagnosing and treating ear, nose, and throat disorders.",
-  consultationFee: "1500",
-  contactNumber: "01310519030",
+  otp: "",
+  specialization: "",
+  licenseNumber: "",
+  qualification: "",
+  expYear: 0,
+  bio: "",
+  consultationFee: "",
+  contactNumber: "",
   resume: null as File | null,
   additionalFiles: [] as File[],
 };
@@ -85,7 +85,8 @@ export default function VerifyDoctorRegistration() {
             toast.add({
               title: "Application failed",
               description:
-                "There was an error submitting your application. Please try again.",
+                error?.response?.data?.message ||
+                "An error occurred while submitting your application. Please try again.",
             });
           },
         },
@@ -308,42 +309,9 @@ export default function VerifyDoctorRegistration() {
                           <FieldLabel htmlFor={field.name}>Resume</FieldLabel>
 
                           <div className="flex items-center gap-3 border border-dashed border-border bg-muted/50 px-3 py-2.5 text-sm text-muted-foreground">
-                            <Button
-                              render={
-                                <label htmlFor={field.name}>
-                                  <FileUp size={4} /> Upload resume
-                                </label>
-                              }
-                              nativeButton={false}
-                              variant={"outline"}
-                            >
-                              <FileUp size={4} /> Upload resume
-                            </Button>
-
-                            <input
-                              className="sr-only"
-                              id={field.name}
-                              name={field.name}
-                              type="file"
-                              onBlur={field.handleBlur}
-                              aria-invalid={isInvalid}
-                              onChange={(e) => {
-                                const file = e.target.files?.[0] || null;
-                                if (
-                                  file &&
-                                  (!isAcceptedFileSize(file?.size) ||
-                                    !isAcceptedFileType(file?.type))
-                                ) {
-                                  field.handleBlur();
-                                  return;
-                                }
-
-                                field.handleChange(file);
-                                e.target.value = "";
-                              }}
-                            />
-                            {file && (
-                              <span>
+                            {file ? (
+                              <span className="flex items-center gap-2 border">
+                                <FileText size={16} color="green" />
                                 {file.name}{" "}
                                 <Button
                                   type="button"
@@ -356,6 +324,34 @@ export default function VerifyDoctorRegistration() {
                                   <X />
                                 </Button>
                               </span>
+                            ) : (
+                              <>
+                                <Button
+                                  render={
+                                    <label htmlFor={field.name}>
+                                      <FileUp size={4} /> Upload resume
+                                    </label>
+                                  }
+                                  nativeButton={false}
+                                  variant={"outline"}
+                                >
+                                  <FileUp size={4} /> Upload resume
+                                </Button>
+
+                                <input
+                                  className="sr-only"
+                                  id={field.name}
+                                  name={field.name}
+                                  type="file"
+                                  onBlur={field.handleBlur}
+                                  aria-invalid={isInvalid}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0] || null;
+                                    field.handleChange(file);
+                                    e.target.value = "";
+                                  }}
+                                />
+                              </>
                             )}
                           </div>
 
@@ -400,31 +396,14 @@ export default function VerifyDoctorRegistration() {
                               onBlur={field.handleBlur}
                               aria-invalid={isInvalid}
                               onChange={(e) => {
-                                // const files = e.target.files || null;
                                 const selectedFiles = Array.from(
                                   e.target.files || [],
                                 );
-                                if (
-                                  selectedFiles.length === 0 ||
-                                  selectedFiles.length > 5
-                                ) {
-                                  return;
-                                }
-
-                                const invalidFiles = selectedFiles.some(
-                                  (file) => {
-                                    return (
-                                      !isAcceptedFileSize(file?.size) ||
-                                      !isAcceptedFileType(file?.type)
-                                    );
-                                  },
-                                );
-
-                                if (invalidFiles) {
-                                  field.handleBlur();
-                                  return;
-                                }
-                                field.handleChange(selectedFiles);
+                                field.handleChange([
+                                  ...files,
+                                  ...selectedFiles,
+                                ]);
+                                field.handleBlur();
                               }}
                             />
                             {files.length > 0 && (
@@ -433,8 +412,9 @@ export default function VerifyDoctorRegistration() {
                                   return (
                                     <li
                                       key={`${file.name}-${index}`}
-                                      className="flex items-center gap-1"
+                                      className="flex items-center gap-1 border"
                                     >
+                                      <FileText size={16} color="green" />
                                       <span>{file.name}</span>
                                       <Button
                                         type="button"

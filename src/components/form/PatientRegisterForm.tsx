@@ -251,6 +251,15 @@ export default function PatientRegisterForm() {
 
       <GoogleAuth />
 
+      <Button
+        variant="outline"
+        className="w-full"
+        render={<Link href="/register/doctor" />}
+        nativeButton={false}
+      >
+        Register as a Doctor
+      </Button>
+
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
