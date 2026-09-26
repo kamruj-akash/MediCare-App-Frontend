@@ -1,8 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/toast";
-import { useGetMe, useLogout } from "@/hooks";
-import { useQueryClient } from "@tanstack/react-query";
+import { useGetMe } from "@/hooks";
 import { HeartPulse } from "lucide-react";
 import Link from "next/link";
 
@@ -14,21 +12,30 @@ const routes = [
 
 export default function Header() {
   const { data: userInfo, isLoading: isGetMeLoading } = useGetMe();
-  const { mutate: logout, isPending: isLogoutPending } = useLogout();
-  const queryClient = useQueryClient();
-  const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: (res) => {
-        console.log(res);
-        toast.add({
-          title: "Logout Successful",
-          description: res?.message || "You have successfully logged out.",
-          type: "success",
-        });
-        queryClient.removeQueries({ queryKey: ["getMe"] });
-      },
-    });
-  };
+  // const { mutate: logout, isPending: isLogoutPending } = useLogout();
+  // const queryClient = useQueryClient();
+  // const handleLogout = () => {
+  //   logout(undefined, {
+  //     onSuccess: (res) => {
+  //       console.log(res);
+  //       toast.add({
+  //         title: "Logout Successful",
+  //         description: res?.message || "You have successfully logged out.",
+  //         type: "success",
+  //       });
+  //       queryClient.removeQueries({ queryKey: ["getMe"] });
+  //     },
+  //   });
+  // };
+  const userRole = userInfo?.data?.role;
+  const redirectToDashboard =
+    userRole === "ADMIN"
+      ? "/admin"
+      : userRole === "DOCTOR"
+        ? "/doctor"
+        : userRole === "PATIENT"
+          ? "/patient"
+          : "/";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur">
@@ -62,12 +69,12 @@ export default function Header() {
             <p>Loading...</p>
           ) : userInfo ? (
             <Button
-              onClick={handleLogout}
-              variant={"destructive"}
+              variant={"default"}
               size={"lg"}
               nativeButton={false}
+              render={<Link href={redirectToDashboard} />}
             >
-              {isLogoutPending ? "Logging out..." : "Logout"}
+              Dashboard
             </Button>
           ) : (
             <Button
