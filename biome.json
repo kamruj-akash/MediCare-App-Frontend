@@ -23,11 +23,19 @@
     "enabled": true,
     "rules": {
       "a11y": {
-        "useValidAriaRole": "info"
+        "useValidAriaRole": "info",
+        "noRedundantRoles": "info",
+        "useSemanticElements": "info"
       },
       "recommended": true,
       "style": {
         "useImportType": "off"
+      },
+      "suspicious": {
+        "noDocumentCookie": "info"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "info"
       }
     },
     "domains": {
