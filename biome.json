@@ -22,6 +22,9 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "a11y": {
+        "useValidAriaRole": "info"
+      },
       "recommended": true,
       "style": {
         "useImportType": "off"

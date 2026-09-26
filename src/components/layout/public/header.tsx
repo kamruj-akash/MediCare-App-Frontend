@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Logo from "@/constants/Logo";
 import { useGetMe } from "@/hooks";
-import { HeartPulse } from "lucide-react";
 import Link from "next/link";
 
 const routes = [
@@ -35,8 +35,10 @@ export default function Header() {
         ? "/doctor"
         : userRole === "PATIENT"
           ? "/patient"
-          : "/";
-
+          : userRole === "SUPER_ADMIN"
+            ? "/admin"
+            : "/";
+  console.log(userRole);
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur">
       <nav
@@ -44,12 +46,7 @@ export default function Header() {
         className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10"
       >
         <Link href="/" className="group flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
-            <HeartPulse aria-hidden="true" className="size-5" />
-          </span>
-          <span className="font-heading text-xl font-bold tracking-tight text-foreground">
-            Medi<span className="text-primary">Care</span>
-          </span>
+          <Logo />
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">

@@ -1,13 +1,22 @@
 "use client";
 
 import { useGetMe } from "@/hooks";
+import { UserRole } from "@/types";
 import { useRouter } from "next/navigation";
 import AuthLoading from "./AuthLoading";
 
-export default function AuthGuard({ children }: { children: React.ReactNode }) {
+export default function AuthGuard({
+  children,
+  roles,
+}: {
+  children: React.ReactNode;
+  roles: UserRole[];
+}) {
   const { data, isLoading, isPending, isError } = useGetMe();
+
   const router = useRouter();
   const user = data?.data;
+  const isAuthenticated = !!user && (!roles || roles.includes(user.role));
   if (isLoading || isPending) {
     return <AuthLoading />;
   }
@@ -15,5 +24,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     router.push("/login");
     return;
   }
-  return <div>authGuard{children}</div>;
+  if (isAuthenticated) {
+    return <div>{children}</div>;
+  }
+  return <div>You are not authorized to access this page.</div>;
 }

@@ -6,3 +6,5 @@ export type TUserRegister = {
     contactNumber?: string;
   };
 };
+
+export type UserRole = "ADMIN" | "DOCTOR" | "PATIENT" | "SUPER_ADMIN";
