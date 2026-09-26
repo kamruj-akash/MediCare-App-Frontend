@@ -11,6 +11,10 @@ export const adminRoutes = [
         title: "Doctor Management",
         url: "/admin/doctor-management",
       },
+      {
+        title: "Doctor Approval",
+        url: "/admin/doctor-approval",
+      },
     ],
   },
   {
