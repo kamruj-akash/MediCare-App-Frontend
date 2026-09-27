@@ -1,6 +1,11 @@
 import { applyAsDoctor, approveDoctor, getAllDoctors } from "@/api";
 import { GetAllDoctorsParams } from "@/types";
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 export function useApplyAsDoctor() {
   return useMutation({
@@ -22,7 +27,11 @@ export function useSuspendedGetAllDoctors(params?: GetAllDoctorsParams) {
 }
 
 export function useDoctorApprovalActions() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: approveDoctor,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-doctors"] });
+    },
   });
 }
