@@ -7,29 +7,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useSuspendedGetAllDoctors } from "@/hooks";
 import DoctorReviewSheet from "./doctorReviewSheet";
 
 export default function DoctorApprovalTable() {
+  const { data } = useSuspendedGetAllDoctors();
+  const doctors = data.data.data;
   return (
-    <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+    <Table className="border border-border">
+      <TableCaption>All Doctors</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
+          <TableHead>name</TableHead>
+          <TableHead>email</TableHead>
+          <TableHead>specialization</TableHead>
+          <TableHead className="text-right">licenseNumber</TableHead>
+          <TableHead className="text-right">Application Date</TableHead>
+          <TableHead className="text-right">Status</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow>
-          <TableCell className="font-medium">INV001</TableCell>
-          <TableCell>Paid</TableCell>
-          <TableCell>Credit Card</TableCell>
-          <TableCell className="text-right">
-            <DoctorReviewSheet />
-          </TableCell>
-        </TableRow>
+        {doctors.map((doctor) => (
+          <TableRow key={doctor.id}>
+            <TableCell>{doctor.name}</TableCell>
+            <TableCell>{doctor.email}</TableCell>
+            <TableCell>{doctor.specialization}</TableCell>
+            <TableCell className="text-right">{doctor.licenseNumber}</TableCell>
+            <TableCell className="text-right">
+              {new Date(doctor.createdAt).toLocaleDateString()}
+            </TableCell>
+            <TableCell className="text-right">
+              {doctor.verificationStatus}
+            </TableCell>
+            <TableCell className="text-right">
+              <DoctorReviewSheet />
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

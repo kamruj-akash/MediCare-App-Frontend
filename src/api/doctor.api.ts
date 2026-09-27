@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/apiClient";
+import { ApiResponse, DoctorResponse } from "@/types/api";
 import { applyAsDoctorPayload } from "@/types/doctor";
 
 export function applyAsDoctor(payload: applyAsDoctorPayload) {
@@ -15,4 +16,8 @@ export function applyAsDoctor(payload: applyAsDoctorPayload) {
     method: "POST",
     body: formData,
   });
+}
+
+export function getAllDoctors() {
+  return apiClient<ApiResponse<DoctorResponse>>("/doctor/all-doctors");
 }

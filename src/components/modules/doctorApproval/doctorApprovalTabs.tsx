@@ -1,6 +1,7 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlignLeft } from "lucide-react";
+import { Suspense } from "react";
 import DoctorApprovalTable from "./doctorApprovalTable";
 
 export default function DoctorApprovalTabs() {
@@ -21,7 +22,9 @@ export default function DoctorApprovalTabs() {
         ))}
       </TabsList>
       <TabsContent value="All">
-        <DoctorApprovalTable />
+        <Suspense fallback={<div>Loading...</div>}>
+          <DoctorApprovalTable />
+        </Suspense>
       </TabsContent>
       <TabsContent value="Pending">Pending</TabsContent>
       <TabsContent value="Approved">Approved</TabsContent>
