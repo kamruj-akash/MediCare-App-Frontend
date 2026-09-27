@@ -1,34 +1,48 @@
 "use client";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlignLeft } from "lucide-react";
-import { Suspense } from "react";
+import { DoctorVerificationStatus } from "@/types";
+import { Suspense, useState } from "react";
 import DoctorApprovalTable from "./doctorApprovalTable";
+import DoctorApprovalTableSkeleton from "./doctorApprovalTableSkeleton";
 
+const verificationStatusTabs: (DoctorVerificationStatus | "ALL")[] = [
+  "ALL",
+  "APPROVE",
+  "PENDING",
+  "REJECT",
+];
+const toTitleCase = (text: string) => {
+  return text.charAt(0) + text.slice(1).toLowerCase();
+};
 export default function DoctorApprovalTabs() {
-  const tabs = [
-    { value: "All", label: "All", icon: <AlignLeft /> },
-    { value: "Pending", label: "Pending", icon: <AlignLeft /> },
-    { value: "Approved", label: "Approved", icon: <AlignLeft /> },
-    { value: "Rejected", label: "Rejected", icon: <AlignLeft /> },
-  ];
+  const [tab, setTab] = useState<DoctorVerificationStatus | "ALL">("ALL");
+  console.log(tab);
   return (
-    <Tabs defaultValue="preview">
-      <TabsList>
-        {tabs.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value}>
-            {tab.icon}
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      <TabsContent value="All">
-        <Suspense fallback={<div>Loading...</div>}>
+    <Tabs
+      defaultValue={tab}
+      onValueChange={(value) =>
+        setTab(value as DoctorVerificationStatus | "ALL")
+      }
+    >
+      <div className="flex items-center justify-between mb-4">
+        <Input className="w-lg" placeholder="Search..." />
+        <TabsList>
+          {verificationStatusTabs.map((tab) => (
+            <TabsTrigger key={tab} value={tab}>
+              {toTitleCase(tab)}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      <TabsContent value="ALL">
+        <Suspense fallback={<DoctorApprovalTableSkeleton />}>
           <DoctorApprovalTable />
         </Suspense>
       </TabsContent>
-      <TabsContent value="Pending">Pending</TabsContent>
-      <TabsContent value="Approved">Approved</TabsContent>
-      <TabsContent value="Rejected">Rejected</TabsContent>
+      <TabsContent value="APPROVE">Approve</TabsContent>
+      <TabsContent value="PENDING">Pending</TabsContent>
+      <TabsContent value="REJECT">Rejected</TabsContent>
     </Tabs>
   );
 }

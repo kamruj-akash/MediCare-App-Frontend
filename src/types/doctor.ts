@@ -17,6 +17,8 @@ export interface applyAsDoctorPayload {
   additionalFiles: File[];
 }
 
+export type DoctorVerificationStatus = "PENDING" | "APPROVE" | "REJECT";
+
 export interface Doctor {
   id: string;
   name: string;
@@ -28,7 +30,7 @@ export interface Doctor {
   bio: string;
   consultationFee: string;
   contactNumber?: string;
-  verificationStatus: string;
+  verificationStatus: DoctorVerificationStatus;
   rejectionReason?: string;
   reviewedBy: string;
   reviewedAt: string;
