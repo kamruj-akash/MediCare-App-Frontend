@@ -8,10 +8,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useSuspendedGetAllDoctors } from "@/hooks";
+import { GetAllDoctorsParams } from "@/types/doctor";
 import DoctorReviewSheet from "./doctorReviewSheet";
 
-export default function DoctorApprovalTable() {
-  const { data } = useSuspendedGetAllDoctors();
+export default function DoctorApprovalTable({
+  ...params
+}: GetAllDoctorsParams) {
+  const { data } = useSuspendedGetAllDoctors(params);
   const doctors = data.data.data;
   return (
     <Table className="border border-border">
@@ -28,6 +31,13 @@ export default function DoctorApprovalTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
+        {doctors.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={7} className="text-center py-10">
+              No doctors found.
+            </TableCell>
+          </TableRow>
+        )}
         {doctors.map((doctor) => (
           <TableRow key={doctor.id}>
             <TableCell>{doctor.name}</TableCell>
@@ -41,7 +51,7 @@ export default function DoctorApprovalTable() {
               {doctor.verificationStatus}
             </TableCell>
             <TableCell className="text-right">
-              <DoctorReviewSheet />
+              <DoctorReviewSheet doctorId={doctor.id} />
             </TableCell>
           </TableRow>
         ))}

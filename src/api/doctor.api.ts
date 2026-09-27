@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/apiClient";
 import { ApiResponse, DoctorResponse } from "@/types/api";
-import { applyAsDoctorPayload } from "@/types/doctor";
+import { applyAsDoctorPayload, GetAllDoctorsParams } from "@/types/doctor";
 
 export function applyAsDoctor(payload: applyAsDoctorPayload) {
   const formData = new FormData();
@@ -18,6 +18,9 @@ export function applyAsDoctor(payload: applyAsDoctorPayload) {
   });
 }
 
-export function getAllDoctors() {
-  return apiClient<ApiResponse<DoctorResponse>>("/doctor/all-doctors");
+export function getAllDoctors(params?: GetAllDoctorsParams) {
+  return apiClient<ApiResponse<DoctorResponse>>("/doctor/all-doctors", {
+    method: "GET",
+    params,
+  });
 }

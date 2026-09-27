@@ -1,4 +1,5 @@
 import { applyAsDoctor, getAllDoctors } from "@/api";
+import { GetAllDoctorsParams } from "@/types";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export function useApplyAsDoctor() {
@@ -7,15 +8,15 @@ export function useApplyAsDoctor() {
   });
 }
 
-export function useGetAllDoctors() {
+export function useGetAllDoctors(params?: GetAllDoctorsParams) {
   return useQuery({
     queryKey: ["all-doctors"],
-    queryFn: getAllDoctors,
+    queryFn: () => getAllDoctors(params),
   });
 }
-export function useSuspendedGetAllDoctors() {
+export function useSuspendedGetAllDoctors(params?: GetAllDoctorsParams) {
   return useSuspenseQuery({
-    queryKey: ["all-doctors"],
-    queryFn: getAllDoctors,
+    queryKey: ["all-doctors", params],
+    queryFn: () => getAllDoctors(params),
   });
 }

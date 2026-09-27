@@ -1,7 +1,8 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DoctorVerificationStatus } from "@/types";
+import { Pagination } from "@/components/ui/pagination";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DoctorVerificationStatus, GetAllDoctorsParams } from "@/types";
 import { Suspense, useState } from "react";
 import DoctorApprovalTable from "./doctorApprovalTable";
 import DoctorApprovalTableSkeleton from "./doctorApprovalTableSkeleton";
@@ -10,23 +11,35 @@ const verificationStatusTabs: (DoctorVerificationStatus | "ALL")[] = [
   "ALL",
   "APPROVE",
   "PENDING",
-  "REJECT",
+  "REJECTED",
 ];
 const toTitleCase = (text: string) => {
   return text.charAt(0) + text.slice(1).toLowerCase();
 };
 export default function DoctorApprovalTabs() {
   const [tab, setTab] = useState<DoctorVerificationStatus | "ALL">("ALL");
-  console.log(tab);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const queryParams: GetAllDoctorsParams = {
+    status: tab === "ALL" ? undefined : tab,
+    page: 1,
+    limit: 10,
+    searchTerm,
+  };
+
   return (
     <Tabs
-      defaultValue={tab}
+      value={tab}
       onValueChange={(value) =>
         setTab(value as DoctorVerificationStatus | "ALL")
       }
     >
       <div className="flex items-center justify-between mb-4">
-        <Input className="w-lg" placeholder="Search..." />
+        <Input
+          className="w-lg"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <TabsList>
           {verificationStatusTabs.map((tab) => (
             <TabsTrigger key={tab} value={tab}>
@@ -35,14 +48,11 @@ export default function DoctorApprovalTabs() {
           ))}
         </TabsList>
       </div>
-      <TabsContent value="ALL">
-        <Suspense fallback={<DoctorApprovalTableSkeleton />}>
-          <DoctorApprovalTable />
-        </Suspense>
-      </TabsContent>
-      <TabsContent value="APPROVE">Approve</TabsContent>
-      <TabsContent value="PENDING">Pending</TabsContent>
-      <TabsContent value="REJECT">Rejected</TabsContent>
+
+      <Suspense fallback={<DoctorApprovalTableSkeleton />}>
+        <DoctorApprovalTable {...queryParams} />
+      </Suspense>
+      <Pagination />
     </Tabs>
   );
 }
