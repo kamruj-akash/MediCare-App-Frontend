@@ -24,3 +24,18 @@ export function getAllDoctors(params?: GetAllDoctorsParams) {
     params,
   });
 }
+
+export function approveDoctor(payload: {
+  doctorId: string;
+  status: string;
+  reason?: string | undefined;
+}) {
+  return apiClient("/doctor/approve", {
+    method: "POST",
+    body: {
+      doctorId: payload.doctorId,
+      verificationStatus: payload.status,
+      rejectionReason: payload.reason,
+    },
+  });
+}
