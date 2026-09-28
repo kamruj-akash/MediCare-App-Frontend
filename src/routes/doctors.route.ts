@@ -5,11 +5,19 @@ export const doctorRoutes = [
     items: [
       {
         title: "Overview",
-        url: "/admin",
+        url: "/doctor",
       },
       {
-        title: "Doctor Management",
-        url: "/admin/doctor-management",
+        title: "Create Schedule",
+        url: "/doctor/create-schedule",
+      },
+      {
+        title: "Schedule Management",
+        url: "/doctor/schedule-management",
+      },
+      {
+        title: "Patient Management",
+        url: "/doctor/patient-management",
       },
     ],
   },
@@ -18,52 +26,7 @@ export const doctorRoutes = [
     url: "#",
     items: [
       {
-        title: "Routing",
-        url: "#",
-      },
-      {
-        title: "Data Fetching",
-        url: "#",
-        isActive: true,
-      },
-      {
-        title: "Rendering",
-        url: "#",
-      },
-      {
-        title: "Caching",
-        url: "#",
-      },
-      {
-        title: "Styling",
-        url: "#",
-      },
-      {
-        title: "Optimizing",
-        url: "#",
-      },
-      {
-        title: "Configuring",
-        url: "#",
-      },
-      {
-        title: "Testing",
-        url: "#",
-      },
-      {
-        title: "Authentication",
-        url: "#",
-      },
-      {
-        title: "Deploying",
-        url: "#",
-      },
-      {
-        title: "Upgrading",
-        url: "#",
-      },
-      {
-        title: "Examples",
+        title: "Profile Settings",
         url: "#",
       },
     ],

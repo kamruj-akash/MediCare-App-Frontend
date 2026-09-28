@@ -13,12 +13,16 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Logo from "@/constants/Logo";
+import { useLogout } from "@/hooks";
 import { adminRoutes } from "@/routes/admin.route";
 import { doctorRoutes } from "@/routes/doctors.route";
 import { patientRoutes } from "@/routes/patient.routes";
 import { UserRole } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import { toast } from "../ui/toast";
 
 const sidebarRoutes = {
   ADMIN: adminRoutes,
@@ -29,6 +33,23 @@ const sidebarRoutes = {
 export function DashboardSidebar({ role }: { role: UserRole }) {
   const userRoute = sidebarRoutes[role];
   const pathName = usePathname();
+  const { mutate: logout, isPending: isLogoutPending } = useLogout();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: (res) => {
+        console.log(res);
+        toast.add({
+          title: "Logout Successful",
+          description: res?.message || "You have successfully logged out.",
+          type: "success",
+        });
+        queryClient.removeQueries({ queryKey: ["getMe"] });
+        router.push("/login");
+      },
+    });
+  };
 
   return (
     <Sidebar>
@@ -60,6 +81,9 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
         ))}
       </SidebarContent>
       <SidebarRail />
+      <Button variant="destructive" size={"lg"} onClick={handleLogout}>
+        {isLogoutPending ? "Logging out..." : "Logout"}
+      </Button>
     </Sidebar>
   );
 }

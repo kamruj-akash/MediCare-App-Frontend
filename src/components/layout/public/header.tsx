@@ -12,21 +12,7 @@ const routes = [
 
 export default function Header() {
   const { data: userInfo, isLoading: isGetMeLoading } = useGetMe();
-  // const { mutate: logout, isPending: isLogoutPending } = useLogout();
-  // const queryClient = useQueryClient();
-  // const handleLogout = () => {
-  //   logout(undefined, {
-  //     onSuccess: (res) => {
-  //       console.log(res);
-  //       toast.add({
-  //         title: "Logout Successful",
-  //         description: res?.message || "You have successfully logged out.",
-  //         type: "success",
-  //       });
-  //       queryClient.removeQueries({ queryKey: ["getMe"] });
-  //     },
-  //   });
-  // };
+
   const userRole = userInfo?.data?.role;
   const redirectToDashboard =
     userRole === "ADMIN"
