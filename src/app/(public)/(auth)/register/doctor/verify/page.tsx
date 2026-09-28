@@ -74,7 +74,7 @@ export default function VerifyDoctorRegistration() {
         },
         {
           onSuccess: () => {
-            router.push("/auth/register/doctor/success");
+            router.push("/register/doctor/register-success");
             toast.add({
               title: "Application submitted",
               description:

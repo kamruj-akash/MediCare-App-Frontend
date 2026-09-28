@@ -47,6 +47,8 @@ export interface Doctor {
 export interface GetAllDoctorsParams {
   page?: number;
   limit?: number;
+  totalPages?: number;
+  total?: number;
   search?: string;
   status?: DoctorVerificationStatus;
   searchTerm?: string;

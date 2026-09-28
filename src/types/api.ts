@@ -6,6 +6,7 @@ export interface DoctorResponse {
     total: number;
     page: number;
     limit: number;
+    totalPages: number;
   };
 }
 

@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/ui/pagination";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDebounce } from "@/hooks/debounce.hook";
 import { DoctorVerificationStatus, GetAllDoctorsParams } from "@/types";
 import { Suspense, useState } from "react";
 import DoctorApprovalTable from "./doctorApprovalTable";
@@ -19,11 +19,13 @@ const toTitleCase = (text: string) => {
 export default function DoctorApprovalTabs() {
   const [tab, setTab] = useState<DoctorVerificationStatus | "ALL">("ALL");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [page, setPage] = useState<number>(1);
   const queryParams: GetAllDoctorsParams = {
     status: tab === "ALL" ? undefined : tab,
-    page: 1,
-    limit: 10,
-    searchTerm,
+    page: page,
+    searchTerm: debouncedSearchTerm,
+    // limit: 1,
   };
 
   return (
@@ -50,9 +52,8 @@ export default function DoctorApprovalTabs() {
       </div>
 
       <Suspense fallback={<DoctorApprovalTableSkeleton />}>
-        <DoctorApprovalTable {...queryParams} />
+        <DoctorApprovalTable setPage={setPage} queryParams={queryParams} />
       </Suspense>
-      <Pagination />
     </Tabs>
   );
 }
