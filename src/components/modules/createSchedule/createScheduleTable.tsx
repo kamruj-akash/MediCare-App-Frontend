@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -6,8 +7,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "@/components/ui/toast";
+import {
+  useDeleteSchedule,
+  useGetDoctorSchedules,
+  usePublishSchedule,
+} from "@/hooks/schedule.hook";
 import { DoctorSchedule } from "@/types/schedule";
 import { cn } from "cn";
+import { format } from "date-fns";
+import { useState } from "react";
 
 type ScheduleStatus = "DRAFT" | "PUBLISHED";
 
@@ -45,21 +54,48 @@ export default function CreateScheduleTable({
   tab: "ALL" | ScheduleStatus;
   searchTerm: string;
 }) {
-  const schedules = mockSchedules.filter((schedule) => {
-    const matchesTab = tab === "ALL" ? true : schedule.status === tab;
-    const matchesSearch = searchTerm
-      ? schedule.date.includes(searchTerm) ||
-        schedule.day.toLowerCase().includes(searchTerm.toLowerCase())
-      : true;
-    return matchesTab && matchesSearch;
-  });
+  const { data, isLoading } = useGetDoctorSchedules();
+  const schedules = data?.data?.data || [];
+
+  // publish schedules
+  const { mutate: publishSchedule } = usePublishSchedule();
+  const handlePublishSchedule = (scheduleId: string) => {
+    publishSchedule(scheduleId, {
+      onSuccess: () => {
+        toast.add({
+          title: "Schedule Published",
+          description: "The schedule has been published successfully.",
+        });
+      },
+      onError: (error) => {
+        console.error("Error publishing schedule:", error);
+      },
+    });
+  };
+
+  // delete schedules
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  const { mutate: deleteSchedule } = useDeleteSchedule();
+  const handleDeleteSchedule = (scheduleId: string) => {
+    deleteSchedule(scheduleId, {
+      onSuccess: () => {
+        toast.add({
+          title: "Schedule Deleted",
+          description: "The schedule has been deleted successfully.",
+        });
+      },
+      onError: (error) => {
+        console.log("Error deleting schedule:", error);
+      },
+    });
+  };
 
   return (
     <Table className="border border-border">
       <TableHeader>
         <TableRow>
           <TableHead>Date</TableHead>
-          <TableHead>Day</TableHead>
           <TableHead>Start Time</TableHead>
           <TableHead>End Time</TableHead>
           <TableHead className="text-right">Slots</TableHead>
@@ -77,11 +113,16 @@ export default function CreateScheduleTable({
         )}
         {schedules.map((schedule) => (
           <TableRow key={schedule.id}>
-            <TableCell>{schedule.date}</TableCell>
-            <TableCell>{schedule.day}</TableCell>
-            <TableCell>{schedule.startTime}</TableCell>
-            <TableCell>{schedule.endTime}</TableCell>
-            <TableCell className="text-right">{schedule.slots}</TableCell>
+            <TableCell>
+              {format(new Date(schedule.startDateTime), "MMM dd, yyyy")}
+            </TableCell>
+            <TableCell>
+              {format(new Date(schedule.startDateTime), "h:mm a")}
+            </TableCell>
+            <TableCell>
+              {format(new Date(schedule.endDateTime), "h:mm a")}
+            </TableCell>
+            <TableCell className="text-right">{`${schedule.availableSlot}/${schedule.totalSlot}`}</TableCell>
             <TableCell className="text-right">
               <span
                 className={cn(
@@ -95,12 +136,42 @@ export default function CreateScheduleTable({
               </span>
             </TableCell>
             <TableCell className="text-right">
-              <button
-                type="button"
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                Edit
-              </button>
+              {deleteConfirm === schedule.id ? (
+                <>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDeleteSchedule(schedule.id)}
+                  >
+                    Confirm
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setDeleteConfirm(null)}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {schedule.status === "DRAFT" && (
+                    <Button
+                      onClick={() => handlePublishSchedule(schedule.id)}
+                      variant="outline"
+                      className="mr-2"
+                    >
+                      Publish
+                    </Button>
+                  )}
+                  {schedule.availableSlot === schedule.totalSlot && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setDeleteConfirm(schedule.id)}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </>
+              )}
             </TableCell>
           </TableRow>
         ))}

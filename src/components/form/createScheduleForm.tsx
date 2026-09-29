@@ -90,6 +90,7 @@ export default function CreateScheduleForm({
 
                 <PopoverContent className="w-auto p-0" align="center">
                   <Calendar
+                    disabled={{ before: new Date() }}
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => {
