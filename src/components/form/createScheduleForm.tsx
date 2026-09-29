@@ -20,8 +20,8 @@ export default function CreateScheduleForm({
   const form = useForm({
     defaultValues: {
       date: "",
-      startTime: "10:30:00",
-      endTime: "17:30:00",
+      startTime: "",
+      endTime: "",
       meetingLink: "",
     },
     validators: {
@@ -34,7 +34,7 @@ export default function CreateScheduleForm({
       const endDateTime = new Date(
         `${value.date}T${value.endTime}`,
       ).toISOString();
-
+      console.log(value);
       const scheduleData = {
         startDateTime,
         endDateTime,
