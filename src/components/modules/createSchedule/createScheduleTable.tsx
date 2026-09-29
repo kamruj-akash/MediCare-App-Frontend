@@ -7,55 +7,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import TablePagination from "@/components/ui/tablePagination";
 import { toast } from "@/components/ui/toast";
 import {
   useDeleteSchedule,
-  useGetDoctorSchedules,
   usePublishSchedule,
+  useSuspendedGetDoctorSchedules,
 } from "@/hooks/schedule.hook";
-import { DoctorSchedule } from "@/types/schedule";
+import { GetDoctorSchedulesParams } from "@/types/schedule";
 import { cn } from "cn";
 import { format } from "date-fns";
 import { useState } from "react";
-
-type ScheduleStatus = "DRAFT" | "PUBLISHED";
-
-type ScheduleRow = {
-  id: string;
-  date: string;
-  day: string;
-  startTime: string;
-  endTime: string;
-  slots: number;
-  status: ScheduleStatus;
-};
-
-const mockSchedules: DoctorSchedule[] = [
-  {
-    id: "1",
-    startDateTime: "2026-09-30",
-    endDateTime: "2026-09-30",
-    totalSlot: 8,
-    availableSlot: 8,
-    meetingLink: "https://example.com/meeting/1",
-    status: "PUBLISHED",
-    isDeleted: false,
-    createdAt: "2026-09-30",
-    updatedAt: "2026-09-30",
-    doctorId: "1",
-    Appointments: [],
-  },
-];
+import ScheduleViewSheet from "./scheduleViewSheet";
 
 export default function CreateScheduleTable({
-  tab,
-  searchTerm,
+  setPage,
+  queryParams,
 }: {
-  tab: "ALL" | ScheduleStatus;
-  searchTerm: string;
+  setPage: (page: number) => void;
+  queryParams: GetDoctorSchedulesParams;
 }) {
-  const { data, isLoading } = useGetDoctorSchedules();
-  const schedules = data?.data?.data || [];
+  const { data } = useSuspendedGetDoctorSchedules(queryParams);
+  const schedules = data.data.data;
+  const totalPages = data.data.meta.totalPages;
 
   // publish schedules
   const { mutate: publishSchedule } = usePublishSchedule();
@@ -92,90 +66,98 @@ export default function CreateScheduleTable({
   };
 
   return (
-    <Table className="border border-border">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Start Time</TableHead>
-          <TableHead>End Time</TableHead>
-          <TableHead className="text-right">Slots</TableHead>
-          <TableHead className="text-right">Status</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {schedules.length === 0 && (
+    <>
+      <Table className="border border-border">
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={7} className="text-center py-10">
-              No schedules found.
-            </TableCell>
+            <TableHead>Date</TableHead>
+            <TableHead>Start Time</TableHead>
+            <TableHead>End Time</TableHead>
+            <TableHead className="text-right">Slots</TableHead>
+            <TableHead className="text-right">Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
-        )}
-        {schedules.map((schedule) => (
-          <TableRow key={schedule.id}>
-            <TableCell>
-              {format(new Date(schedule.startDateTime), "MMM dd, yyyy")}
-            </TableCell>
-            <TableCell>
-              {format(new Date(schedule.startDateTime), "h:mm a")}
-            </TableCell>
-            <TableCell>
-              {format(new Date(schedule.endDateTime), "h:mm a")}
-            </TableCell>
-            <TableCell className="text-right">{`${schedule.availableSlot}/${schedule.totalSlot}`}</TableCell>
-            <TableCell className="text-right">
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                  schedule.status === "PUBLISHED"
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {schedule.status === "PUBLISHED" ? "Published" : "Draft"}
-              </span>
-            </TableCell>
-            <TableCell className="text-right">
-              {deleteConfirm === schedule.id ? (
-                <>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDeleteSchedule(schedule.id)}
-                  >
-                    Confirm
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setDeleteConfirm(null)}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  {schedule.status === "DRAFT" && (
-                    <Button
-                      onClick={() => handlePublishSchedule(schedule.id)}
-                      variant="outline"
-                      className="mr-2"
-                    >
-                      Publish
-                    </Button>
+        </TableHeader>
+        <TableBody>
+          {schedules.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-10">
+                No schedules found.
+              </TableCell>
+            </TableRow>
+          )}
+          {schedules.map((schedule) => (
+            <TableRow key={schedule.id}>
+              <TableCell>
+                {format(new Date(schedule.startDateTime), "MMM dd, yyyy")}
+              </TableCell>
+              <TableCell>
+                {format(new Date(schedule.startDateTime), "h:mm a")}
+              </TableCell>
+              <TableCell>
+                {format(new Date(schedule.endDateTime), "h:mm a")}
+              </TableCell>
+              <TableCell className="text-right">{`${schedule.availableSlot}/${schedule.totalSlot}`}</TableCell>
+              <TableCell className="text-right">
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                    schedule.status === "PUBLISHED"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground",
                   )}
-                  {schedule.availableSlot === schedule.totalSlot && (
+                >
+                  {schedule.status === "PUBLISHED" ? "Published" : "Draft"}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <ScheduleViewSheet schedule={schedule} />
+                {deleteConfirm === schedule.id ? (
+                  <>
                     <Button
                       variant="destructive"
-                      onClick={() => setDeleteConfirm(schedule.id)}
+                      className="ml-2"
+                      onClick={() => handleDeleteSchedule(schedule.id)}
                     >
-                      Delete
+                      Confirm
                     </Button>
-                  )}
-                </>
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                    <Button
+                      variant="outline"
+                      className="ml-2"
+                      onClick={() => setDeleteConfirm(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    {schedule.status === "DRAFT" && (
+                      <Button
+                        onClick={() => handlePublishSchedule(schedule.id)}
+                        variant="outline"
+                        className="ml-2"
+                      >
+                        Publish
+                      </Button>
+                    )}
+                    {schedule.availableSlot === schedule.totalSlot && (
+                      <Button
+                        variant="destructive"
+                        className="ml-2"
+                        onClick={() => setDeleteConfirm(schedule.id)}
+                      >
+                        Delete
+                      </Button>
+                    )}
+                  </>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <TablePagination setPage={setPage} totalPages={totalPages} />
+    </>
   );
 }

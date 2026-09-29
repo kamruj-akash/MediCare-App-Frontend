@@ -1,3 +1,5 @@
+export type ScheduleStatus = "DRAFT" | "PUBLISHED";
+
 export interface DoctorSchedule {
   id: string;
   startDateTime: string;
@@ -5,13 +7,20 @@ export interface DoctorSchedule {
   totalSlot: number;
   availableSlot: number;
   meetingLink: string;
-  status: string;
+  status: ScheduleStatus;
   isDeleted: boolean;
   deletedAt?: string;
   createdAt: string;
   updatedAt: string;
   doctorId: string;
   Appointments: Appointment[];
+}
+
+export interface GetDoctorSchedulesParams {
+  page?: number;
+  limit?: number;
+  status?: ScheduleStatus;
+  searchTerm?: string;
 }
 
 export interface Appointment {

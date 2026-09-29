@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/apiClient";
 import { ApiResponse, DoctorScheduleResponse } from "@/types/api";
+import { GetDoctorSchedulesParams } from "@/types/schedule";
 
 export function createSchedule(payload: {
   startDateTime: string;
@@ -16,9 +17,13 @@ export function createSchedule(payload: {
   });
 }
 
-export function getDoctorSchedules() {
+export function getDoctorSchedules(params?: GetDoctorSchedulesParams) {
   return apiClient<ApiResponse<DoctorScheduleResponse>>(
     "/schedule/my-schedules",
+    {
+      method: "GET",
+      params,
+    },
   );
 }
 
