@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Doctor } from "@/types/doctor";
 import { BriefcaseMedical, GraduationCap, Wallet } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const getInitials = (name: string) =>
@@ -16,8 +17,7 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
     <div className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center gap-4">
         {doctor.user?.profileImage ? (
-          // biome-ignore lint/performance/noImgElement: avatar host is dynamic/unconfigured for next/image
-          <img
+          <Image
             src={doctor.user.profileImage}
             alt={doctor.name}
             className="size-14 shrink-0 rounded-2xl object-cover"
@@ -46,13 +46,20 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
       <div className="mt-5 space-y-2.5 border-t border-border pt-5 text-sm text-muted-foreground">
         {doctor.qualification && (
           <p className="flex items-center gap-2.5">
-            <GraduationCap className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            <GraduationCap
+              className="size-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
             {doctor.qualification}
           </p>
         )}
         <p className="flex items-center gap-2.5">
-          <BriefcaseMedical className="size-4 shrink-0 text-primary" aria-hidden="true" />
-          {doctor.expYear} {doctor.expYear === 1 ? "year" : "years"} of experience
+          <BriefcaseMedical
+            className="size-4 shrink-0 text-primary"
+            aria-hidden="true"
+          />
+          {doctor.expYear} {doctor.expYear === 1 ? "year" : "years"} of
+          experience
         </p>
         <p className="flex items-center gap-2.5">
           <Wallet className="size-4 shrink-0 text-primary" aria-hidden="true" />
@@ -62,7 +69,7 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
 
       <Button
         className="mt-6 h-10 w-full text-sm"
-        render={<Link href="/login" />}
+        render={<Link href={`/doctors/${doctor.id}`} />}
         nativeButton={false}
       >
         Book Appointment

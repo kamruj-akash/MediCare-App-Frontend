@@ -32,7 +32,8 @@
         "useImportType": "off"
       },
       "suspicious": {
-        "noDocumentCookie": "info"
+        "noDocumentCookie": "info",
+        "noArrayIndexKey": "info"
       },
       "correctness": {
         "useExhaustiveDependencies": "info"

@@ -54,7 +54,8 @@ export default function DoctorsList() {
           </p>
         ) : doctors.length === 0 ? (
           <p className="py-16 text-center text-sm text-muted-foreground">
-            No doctors found{debouncedSearchTerm ? ` for "${debouncedSearchTerm}"` : ""}.
+            No doctors found
+            {debouncedSearchTerm ? ` for "${debouncedSearchTerm}"` : ""}.
           </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
