@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Doctor } from "@/types/doctor";
 import { BriefcaseMedical, GraduationCap, Wallet } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const getInitials = (name: string) =>
@@ -17,7 +16,8 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
     <div className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center gap-4">
         {doctor.user?.profileImage ? (
-          <Image
+          // biome-ignore lint/performance/noImgElement: avatar host is dynamic/unconfigured for next/image
+          <img
             src={doctor.user.profileImage}
             alt={doctor.name}
             className="size-14 shrink-0 rounded-2xl object-cover"

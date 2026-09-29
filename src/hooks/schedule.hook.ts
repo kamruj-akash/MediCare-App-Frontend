@@ -2,6 +2,7 @@ import {
   createSchedule,
   deleteSchedule,
   getDoctorSchedules,
+  getDoctorTodaySchedule,
   publishSchedule,
 } from "@/api/schedule.api";
 import { GetDoctorSchedulesParams } from "@/types/schedule";
@@ -35,6 +36,14 @@ export function useSuspendedGetDoctorSchedules(
   return useSuspenseQuery({
     queryKey: ["doctor-schedules", params],
     queryFn: () => getDoctorSchedules(params),
+  });
+}
+
+export function useGetDoctorTodaySchedule(doctorId: string) {
+  return useQuery({
+    queryKey: ["doctor-today-schedule", doctorId],
+    queryFn: () => getDoctorTodaySchedule(doctorId),
+    enabled: !!doctorId,
   });
 }
 
