@@ -15,7 +15,7 @@ export function useApplyAsDoctor() {
 
 export function useGetAllDoctors(params?: GetAllDoctorsParams) {
   return useQuery({
-    queryKey: ["all-doctors"],
+    queryKey: ["all-doctors", params],
     queryFn: () => getAllDoctors(params),
   });
 }

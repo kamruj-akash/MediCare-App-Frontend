@@ -52,4 +52,6 @@ export interface GetAllDoctorsParams {
   search?: string;
   status?: DoctorVerificationStatus;
   searchTerm?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }

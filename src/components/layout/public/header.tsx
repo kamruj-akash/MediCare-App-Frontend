@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const routes = [
   { name: "Home", href: "/" },
+  { name: "Doctors", href: "/doctors" },
   { name: "About Us", href: "/about-us" },
   { name: "Contact Us", href: "/contact-us" },
 ];
