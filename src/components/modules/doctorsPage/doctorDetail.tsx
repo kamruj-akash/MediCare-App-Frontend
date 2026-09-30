@@ -1,8 +1,12 @@
 "use client";
 
 import AuthGuard from "@/components/auth/authGuard";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/components/ui/toast";
+import { useBookAppointment } from "@/hooks/appointment.hook";
 import { useGetAllDoctors } from "@/hooks/doctor.hook";
+import { useGetMe } from "@/hooks/auth.hook";
 import { useGetDoctorTodaySchedule } from "@/hooks/schedule.hook";
 import { format } from "date-fns";
 import {
@@ -34,6 +38,9 @@ function DoctorDetailContent({ doctorId }: { doctorId: string }) {
     sortOrder: "asc",
   });
   const doctor = data?.data.data.find((doc) => doc.id === doctorId);
+
+  const { data: meRes } = useGetMe();
+  const canBookAppointment = meRes?.data?.role === "PATIENT";
 
   const {
     data: todayScheduleRes,
@@ -175,6 +182,17 @@ function DoctorDetailContent({ doctorId }: { doctorId: string }) {
                       Virtual consultation via secure video link
                     </p>
                   )}
+                  {canBookAppointment ? (
+                    <BookAppointmentButton
+                      doctorId={doctorId}
+                      scheduleId={schedule.id}
+                      disabled={schedule.availableSlot === 0}
+                    />
+                  ) : (
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
+                      Only patients can book appointments.
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -182,6 +200,59 @@ function DoctorDetailContent({ doctorId }: { doctorId: string }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function BookAppointmentButton({
+  doctorId,
+  scheduleId,
+  disabled,
+}: {
+  doctorId: string;
+  scheduleId: string;
+  disabled?: boolean;
+}) {
+  const { mutate, isPending } = useBookAppointment();
+
+  const handleBook = () => {
+    mutate(
+      { doctorId, scheduleId },
+      {
+        onSuccess: (res) => {
+          if (res.data) {
+            window.location.href = res.data;
+            return;
+          }
+          toast.add({
+            title: "Booking failed",
+            description: "No payment link was returned. Please try again.",
+          });
+        },
+        onError: (error) => {
+          toast.add({
+            title: "Booking failed",
+            description:
+              "Something went wrong while booking your appointment. Please try again.",
+          });
+          console.error("Error booking appointment:", error);
+        },
+      },
+    );
+  };
+
+  return (
+    <Button
+      size="sm"
+      className="mt-4 w-full"
+      disabled={disabled || isPending}
+      onClick={handleBook}
+    >
+      {isPending
+        ? "Redirecting to payment..."
+        : disabled
+          ? "Fully Booked"
+          : "Book Appointment"}
+    </Button>
   );
 }
 
